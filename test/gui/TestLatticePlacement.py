@@ -1,10 +1,8 @@
 import unittest
 
 import FreeCAD as App
-import FreeCADGui as Gui
 
 import lattice2ArrayFromShape
-import lattice2Executer
 import lattice2Placement
 
 
