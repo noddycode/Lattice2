@@ -29,7 +29,7 @@ class TestLatticeAttachment(unittest.TestCase):
         attachmentDialog = Gui.Control.activeTaskDialog()
         self.assertIsNotNone(attachmentDialog, msg="Attachment dialog not found")
 
-        placement.AttachmentSupport= [(cube, "")]
+        placement.AttachmentSupport= [(cube.Name, ("",))]
         placement.MapMode = "ObjectXY"
         self.doc.recompute()
 
@@ -49,6 +49,7 @@ class TestLatticeAttachment(unittest.TestCase):
             sketch.addGeometry(Part.LineSegment(App.Vector(0,i,0), App.Vector(10,i,0)))  # Horizontal line
             sketch.addGeometry(Part.LineSegment(App.Vector(10,i,0), App.Vector(10,i+10,0)))  # Vertical line
             sketch.addConstraint(Sketcher.Constraint('Coincident', 2*i, 2, 2*i+1, 1))  # Vertical line start to horizontal line end
+        self.doc.recompute()
 
         attachedPlacementName = "Attached_Placement"
         attachedPlacement = lattice2AttachablePlacement.makeAttachablePlacement(name=attachedPlacementName)
@@ -60,10 +61,20 @@ class TestLatticeAttachment(unittest.TestCase):
         arrayPlacement = lattice2AttachablePlacement.makeLatticeAttachedPlacementSubsequence(name=arrayPlacementName)
         arrayPlacement.Base = attachedPlacement
         arrayPlacement.CycleMode = "Open"
+        self.doc.recompute()
 
+        print(arrayPlacement.NumElements)
         arrayPlacement = self.doc.getObject(arrayPlacementName)
         self.assertIsNotNone(arrayPlacement, msg=f"Placement {arrayPlacementName} not found")
-        self.assertEqual()
+        self.assertEqual(numInstances-2, arrayPlacement.NumElements)  # Open cycle should not include first two instances
+
+        arrayPlacement.CycleMode = "Periodic"
+        self.doc.recompute()
+
+        self.assertEqual(23, arrayPlacement.NumElements)  # Periodic cycle should loop to include all instances
+
+
+
 
 
 
