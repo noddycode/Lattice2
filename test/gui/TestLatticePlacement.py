@@ -13,7 +13,7 @@ class TestLatticePlacement(unittest.TestCase):
         self.doc = App.newDocument("TestLatticePlacement")
 
     def tearDown(self):
-        self.doc.clearDocument()
+        App.closeDocument(self.doc.Name)
 
     def _test_common(self, placement, expectedPlacementName, identifier):
         self.assertIsNotNone(placement, msg=f"Placement {expectedPlacementName} not found")

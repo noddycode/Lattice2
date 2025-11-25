@@ -14,7 +14,7 @@ class TestLatticeAttachment(unittest.TestCase):
         self.doc = App.newDocument("TestLatticeAttachment")
 
     def tearDown(self):
-        self.doc.clearDocument()
+        App.closeDocument(self.doc.Name)
 
     def test_attached_placement(self):
         """ Test creation of a single attached placement object."""
@@ -29,7 +29,8 @@ class TestLatticeAttachment(unittest.TestCase):
         attachmentDialog = Gui.Control.activeTaskDialog()
         self.assertIsNotNone(attachmentDialog, msg="Attachment dialog not found")
 
-        placement.AttachmentSupport = [(cube, "")]
+        placement.AttachmentSupport = ((cube,))
+        self.doc.recompute()
         placement.MapMode = "ObjectXY"
         self.doc.recompute()
 
@@ -54,6 +55,7 @@ class TestLatticeAttachment(unittest.TestCase):
         attachedPlacementName = "Attached_Placement"
         attachedPlacement = lattice2AttachablePlacement.makeAttachablePlacement(name=attachedPlacementName)
         attachedPlacement.AttachmentSupport = [(sketch, "Edge5"), (sketch, "Edge6")]
+        self.doc.recompute()
         attachedPlacement.MapMode = "InertialCS"
         self.doc.recompute()
 
