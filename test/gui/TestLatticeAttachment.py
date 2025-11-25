@@ -2,7 +2,6 @@ import unittest
 
 import FreeCAD as App
 import FreeCADGui as Gui
-
 import Part
 import Sketcher
 
@@ -28,10 +27,12 @@ class TestLatticeAttachment(unittest.TestCase):
         # Confirm attachment dialog is open
         attachmentDialog = Gui.Control.activeTaskDialog()
         self.assertIsNotNone(attachmentDialog, msg="Attachment dialog not found")
+        attachmentDialog.reject()
 
+        mapMode = "ObjectXY"
         placement.AttachmentSupport = ((cube,))
         self.doc.recompute()
-        placement.MapMode = "ObjectXY"
+        placement.MapMode = mapMode
         self.doc.recompute()
 
         placement = self.doc.getObject(placementName)
@@ -39,7 +40,7 @@ class TestLatticeAttachment(unittest.TestCase):
         self.assertEqual(1, placement.NumElements)
         self.assertEqual(cube.Placement.Base, placement.Placement.Base)
         self.assertEqual(cube.Name, placement.AttachmentSupport[0][0].Name)
-        self.assertEqual("ObjectXY", placement.MapMode)
+        self.assertEqual(mapMode, placement.MapMode)
 
     def test_array_attached_placement(self):
         """ Test creation of array attached placement objects."""
@@ -69,7 +70,7 @@ class TestLatticeAttachment(unittest.TestCase):
         self.assertIsNotNone(arrayPlacement, msg=f"Placement {arrayPlacementName} not found")
         self.assertEqual(numInstances - 2, arrayPlacement.NumElements)  # Should only have placements for edges 3 to 8
 
-        arrayPlacement.CycleMode = "Periodic"
+        arrayPlacement.CycleMode = "Periodic"  # Allows looping back to first instance
         self.doc.recompute()
 
-        self.assertEqual(numInstances, arrayPlacement.NumElements)  # Now should have placements for all edges
+        self.assertEqual(numInstances, arrayPlacement.NumElements)  # Now should have placements for all instances

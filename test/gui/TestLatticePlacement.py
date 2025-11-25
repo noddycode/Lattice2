@@ -16,10 +16,10 @@ class TestLatticePlacement(unittest.TestCase):
         App.closeDocument(self.doc.Name)
 
     def _test_common(self, placement, expectedPlacementName, identifier):
-        self.assertIsNotNone(placement, msg=f"Placement {expectedPlacementName} not found")
+        self.assertIsNotNone(placement, msg=f"Placement {identifier} not found")
         self.assertEqual(expectedPlacementName, placement.Name,
-                         msg=f"Placement name mismatch for {expectedPlacementName}")
-        self.assertEqual(1, placement.NumElements, msg=f"Placement NumElements mismatch for {expectedPlacementName}")
+                         msg=f"Placement name mismatch for {identifier}")
+        self.assertEqual(1, placement.NumElements, msg=f"Placement NumElements mismatch for {identifier}")
 
     def test_basic_single_lattice_placement(self):
         """ Test creation and rotation of basic single lattice placement objects. """
