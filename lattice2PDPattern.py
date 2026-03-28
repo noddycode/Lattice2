@@ -134,16 +134,22 @@ def feature_sign(feature, raise_if_unsupported = False):
             return unsupported()
     return unsupported()
     
+def getShapeCheckNull(obj, prop_name):
+    sh = getattr(obj, prop_name)
+    if sh.isNull():
+        raise ValueError(f"{obj.Label}/{prop_name} shape is null")
+    return sh
+
 def getFeatureShapes(feature):
     sign = feature_sign(feature, raise_if_unsupported= True)
     if hasattr(feature, 'AddSubShape'):
-        sh = shallowCopy(feature.AddSubShape)
+        sh = shallowCopy(getShapeCheckNull(feature, 'AddSubShape'))
         sh.Placement = feature.Placement
         return [(sign, sh)]
     elif feature.isDerivedFrom('PartDesign::Boolean'):
-        return [(sign, obj.Shape) for obj in feature.Group]
+        return [(sign, getShapeCheckNull(obj,'Shape')) for obj in feature.Group]
     elif feature.isDerivedFrom('PartDesign::FeatureBase'):
-        sh = shallowCopy(feature.Shape)
+        sh = shallowCopy(getShapeCheckNull(feature,'Shape'))
         return [(sign, sh)]
     else:
         raise FeatureUnsupportedError("Feature {name} is not supported.".format(name= feature.Name))
@@ -351,7 +357,14 @@ class ViewProviderLatticePDPattern:
             return []
         return [self.Object.PlacementsTo]
         
-    def onDelete(self, feature, subelements): # subelements is a tuple of strings
+    def onDelete(self, host_vp, subelements): # subelements is a tuple of strings
+        # reconnect next PD feature to the one before self
+        host = self.Object
+        dependent_objs = host.InList
+        for obj in dependent_objs:
+            if getattr(obj,'BaseFeature',None) == host:
+                obj.BaseFeature = host.BaseFeature
+
         return True
     
     def setEdit(self,vobj,mode):
